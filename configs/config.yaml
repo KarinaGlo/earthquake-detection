@@ -13,6 +13,9 @@ dataset:
   name: "STEAD"
   source: "seisbench"  # 'seisbench' atau 'local'
   local_path: "data/raw/stead"  # Digunakan jika source == 'local'
+  use_backup_repository: false  # true untuk menggunakan mirror gfz.de
+  download_timeout: 15          # Timeout (detik) untuk koneksi HTTP
+  allow_large_download: false   # Safeguard: jangan unduh puluhan GB tanpa izin eksplisit
 
   # Subset configuration
   subset:
