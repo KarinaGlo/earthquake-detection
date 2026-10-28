@@ -1,0 +1,74 @@
+# Git ignore rules for Earthquake Detection Project
+
+# ---- Data Files (Do NOT commit to Git) ----
+data/raw/
+data/processed/
+*.hdf5
+*.h5
+*.mseed
+*.miniseed
+*.csv
+!configs/*.csv
+
+# ---- Model Weights ----
+models/checkpoints/
+models/*.pth
+models/*.pt
+models/*.onnx
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ---- Jupyter Notebooks ----
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ---- IDEs ----
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---- OS Files ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Logs ----
+logs/
+*.log
+runs/
+
+# ---- Temporary Files ----
+tmp/
+temp/
+*.tmp
+*.bak
+
+# ---- SeisBench Cache ----
+~/.seisbench/
+seisbench_cache/
+
+# ---- Reports (keep structure, ignore generated reports) ----
+reports/evaluation_report.md
+reports/figures/
+
+# ---- Keep these files ----
+!reports/dataset_audit.md
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!models/.gitkeep

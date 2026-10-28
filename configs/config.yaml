@@ -1,0 +1,131 @@
+# ===================================================
+# Konfigurasi Proyek Deteksi Gempa Bumi
+# earthquake-detection/configs/config.yaml
+# ===================================================
+
+project:
+  name: "Earthquake Detection Deep Learning"
+  version: "1.0.0"
+  description: "Deteksi Kejadian Gempa Bumi Menggunakan Deep Learning Berbasis Analisis Sinyal Seismik"
+
+# ---- Dataset Configuration ----
+dataset:
+  name: "STEAD"
+  source: "seisbench"  # 'seisbench' atau 'local'
+  local_path: "data/raw/stead"  # Digunakan jika source == 'local'
+
+  # Subset configuration
+  subset:
+    n_earthquake: 50000   # Jumlah rekaman gempa untuk subset
+    n_noise: 10000        # Jumlah rekaman noise untuk subset
+    min_snr_db: 10.0      # SNR minimum (dB) untuk filter kualitas
+    seed: 42              # Random seed untuk reprodusibilitas
+
+  # Split ratios
+  split:
+    train: 0.70
+    val: 0.15
+    test: 0.15
+    strategy: "by_network"  # 'by_network', 'by_event', atau 'random'
+
+  # Waveform parameters
+  waveform:
+    sampling_rate: 100    # Hz
+    window_duration: 60   # detik (60s = 6000 sampel)
+    n_samples: 6000       # sampling_rate * window_duration
+    n_channels: 3         # E, N, Z
+
+  # Labels
+  labels:
+    earthquake: 1
+    noise: 0
+    earthquake_category: "earthquake_local"
+    noise_category: "noise"
+
+# ---- Preprocessing Configuration ----
+preprocessing:
+  # Normalization
+  normalization:
+    method: "peak"       # 'peak', 'std', atau 'none'
+
+  # Spectrogram (untuk CNN)
+  spectrogram:
+    n_fft: 256
+    hop_length: 10        # sampel
+    win_length: 100       # sampel (1 detik pada 100 Hz)
+    window: "hann"
+    freq_min: 1.0         # Hz
+    freq_max: 45.0        # Hz
+
+  # Processed data output
+  processed_dir: "data/processed"
+  metadata_file: "data/processed/metadata.csv"
+
+# ---- Model Configuration ----
+model:
+  # Default model untuk training
+  default: "cnn_spectrogram"  # 'cnn_spectrogram' atau 'cnn_1d'
+
+  # CNN Spectrogram Model
+  cnn_spectrogram:
+    input_channels: 1
+    dropout: 0.3
+    num_classes: 2
+    architecture: "resnet_lite"  # arsitektur custom lightweight
+
+  # 1D CNN Baseline
+  cnn_1d:
+    input_channels: 3    # 3-component waveform
+    dropout: 0.3
+    num_classes: 2
+
+# ---- Training Configuration ----
+training:
+  batch_size: 64
+  max_epochs: 50
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  optimizer: "adam"
+  scheduler: "cosine"    # 'cosine', 'step', atau 'none'
+  early_stopping:
+    patience: 10
+    monitor: "val_f1"
+
+  # Class imbalance handling
+  class_weights:
+    enabled: true
+    method: "computed"   # 'computed' dari data atau 'manual'
+    manual_weights:      # Digunakan jika method == 'manual'
+      noise: 5.0
+      earthquake: 1.0
+
+  # Checkpointing
+  checkpoint_dir: "models/checkpoints"
+  best_model_path: "models/best_model.pth"
+
+# ---- Evaluation Configuration ----
+evaluation:
+  threshold: 0.5         # Probabilitas threshold untuk klasifikasi
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1_score
+    - roc_auc
+    - pr_auc
+    - confusion_matrix
+  output_dir: "reports"
+
+# ---- Inference Configuration ----
+inference:
+  model_path: "models/best_model.pth"
+  device: "auto"         # 'auto', 'cpu', atau 'cuda'
+  batch_size: 1          # Untuk inferensi satu trace
+
+# ---- Paths ----
+paths:
+  data_raw: "data/raw"
+  data_processed: "data/processed"
+  models: "models"
+  reports: "reports"
+  logs: "logs"
